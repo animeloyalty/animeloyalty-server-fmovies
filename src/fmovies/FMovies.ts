@@ -12,10 +12,12 @@ const baseUrl = 'https://fmovies.to';
 export class FMovies implements app.IProvider {
   private readonly browserService: app.BrowserService;
   private readonly composeService: app.ComposeService;
+  private readonly loggerService: app.LoggerService;
 
-  constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
+  constructor(browserService: app.BrowserService, composeService: app.ComposeService, loggerService: app.LoggerService) {
     this.browserService = browserService;
     this.composeService = composeService;
+    this.loggerService = loggerService;
   }
 
   contextAsync() {
@@ -60,6 +62,7 @@ export class FMovies implements app.IProvider {
   async seriesAsync(seriesUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
+      await FMoviesUtilities.tryCaptchaAsync(this.loggerService, page);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeriesAsync);
       return this.composeService.series(seriesUrl, series, headers);
@@ -71,6 +74,7 @@ export class FMovies implements app.IProvider {
       const [streamPromise, subtitlePromise] = new app.Observer(page).getAsync(/^https:\/\/mcloud2\.to\/info\//, /^https:\/\/fmovies\.to\/ajax\/episode\/subtitles/);
       await page.addInitScript(initStream);
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
+      await FMoviesUtilities.tryCaptchaAsync(this.loggerService, page);
       const streamData = await streamPromise.then(x => x.json()) as StreamResponse;
       const subtitleData = await subtitlePromise.then(x => x.json()) as SubtitleResponse;
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
