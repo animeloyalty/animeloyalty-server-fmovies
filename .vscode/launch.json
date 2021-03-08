@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [{
+    "name": "Attach Program",
+    "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+    "preLaunchTask": "TypeScript",
+    "port": 16583,
+    "request": "attach",
+    "type": "node"
+  }]
+}
