@@ -70,12 +70,11 @@ async function evaluateSeriesAsync() {
     if (!seasonNode) return [];
     return Array.from(fetchEpisodeContainer(seasonNode).querySelectorAll('li')).map((episodeNode) => {
       const data = processName(episodeNode.textContent && episodeNode.textContent.trim());
-      const imageUrl = undefined;
       const isPremium = false;
       const name = data.name;
       const title = data.title;
       const url = processUrl(episodeNode.querySelector('a'));
-      return {imageUrl, isPremium, name, title, url};
+      return {isPremium, name, title, url};
     });
   }
 
